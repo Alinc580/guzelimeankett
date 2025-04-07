@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>güzelime anket</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #2ecc71;
+            text-align: center;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+        }
+        h1 {
+            color: #2ecc71;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        .options {
+            margin: 30px 0;
+        }
+        .option {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 20px;
+            background: rgba(255, 77, 77, 0.2);
+            border: 2px solid #ff4d4d;
+            border-radius: 8px;
+            color: #ff9999;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        #correct {
+            background: rgba(46, 204, 113, 0.1);
+            border: 2px solid #2ecc71;
+            color: #2ecc71;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 10;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="ask-gifim.gif" 
+        style="width: 200px; height: auto; 
+                border: 2px solid #2ecc71; 
+                border-radius: 10px;">
+        <h1>Merhaba Sayın Albüke Alhan,</h1>
+        <p>Sizce Ali İnce ile sevgili olma olasılığınız kaçtır?</p>
+        <h1>DİPNOT! TÜM SEÇENEKLERİ DENEYEBİLİRSİNİZ</h1>
+        <div class="options">
+            <div class="option">%10</div>
+            <div class="option">%20</div>
+            <div class="option">%30</div>
+            <div class="option">%40</div>
+            <div class="option">%50</div>
+            <div class="option">%60</div>
+            <div class="option">%70</div>
+            <div class="option">%80</div>
+            <div class="option">%90</div>
+        </div>
+        
+        <div id="correct">%100</div>
+    </div>
+
+    <script>
+        window.onload = () => {
+            const options = document.querySelectorAll('.option');
+            const correct = document.getElementById('correct');
+            const correctRect = correct.getBoundingClientRect();
+
+            const safeZone = {
+                top: correctRect.top - 20,
+                bottom: correctRect.bottom + 20,
+                left: correctRect.left - 20,
+                right: correctRect.right + 20
+            };
+
+            options.forEach(option => {
+                const hue = 350 + Math.floor(Math.random() * 20);
+                option.style.color = `hsl(${hue}, 70%, 70%)`;
+                option.style.borderColor = `hsl(${hue}, 70%, 50%)`;
+
+                option.addEventListener('mouseover', () => {
+                    let newX, newY;
+                    do {
+                        newX = Math.random() > 0.5 ?
+                            Math.random() * (window.innerWidth * 0.3) :
+                            window.innerWidth * 0.7 + Math.random() * (window.innerWidth * 0.3);
+                        newY = 100 + Math.random() * (window.innerHeight - 200);
+                    } while (
+                        newX > safeZone.left &&
+                        newX < safeZone.right &&
+                        newY > safeZone.top &&
+                        newY < safeZone.bottom
+                    );
+
+                    option.style.position = 'fixed';
+                    option.style.left = `${newX}px`;
+                    option.style.top = `${newY}px`;
+
+                    const newHue = 350 + Math.floor(Math.random() * 20);
+                    option.style.color = `hsl(${newHue}, 70%, 70%)`;
+                    option.style.borderColor = `hsl(${newHue}, 70%, 50%)`;
+                });
+            });
+
+            correct.addEventListener('click', () => {
+                document.body.innerHTML = `
+                <canvas id="fireworks" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;"></canvas>
+                <div style="text-align:center; position:relative; z-index:1; padding-top:100px;">
+                    <img src="albuke-foto.jpg" 
+                        style="width:180px; 
+                               border-radius:8px; 
+                               border:2px solid #2ecc71;
+                               margin-bottom:15px;
+                               box-shadow:0 0 10px rgba(46,204,113,0.3)">
+                    <h1 style="color:#2ecc71; font-size:2.5rem;">doğru cevap yavrum</h1>
+                    <p style="color:#fff; font-size:1.2rem;">kırptığın gözün üstünden öpüyorum!</p>
+                </div>
+                `;
+
+                startFireworks();
+            });
+
+            function startFireworks() {
+                const canvas = document.getElementById('fireworks');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                class Particle {
+                    constructor(x, y) {
+                        this.x = x;
+                        this.y = y;
+                        this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                        this.velocity = {
+                            x: (Math.random() - 0.5) * 6,
+                            y: (Math.random() - 0.5) * 6
+                        };
+                        this.alpha = 1;
+                        this.decay = Math.random() * 0.01 + 0.005;
+                        this.size = Math.random() * 3 + 2;
+                    }
+
+                    draw() {
+                        ctx.globalAlpha = this.alpha;
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    update() {
+                        this.velocity.y += 0.05;
+                        this.x += this.velocity.x;
+                        this.y += this.velocity.y;
+                        this.alpha -= this.decay;
+                    }
+                }
+
+                let particles = [];
+
+                function createFirework() {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height * 0.5;
+                    for (let i = 0; i < 50; i++) {
+                        particles.push(new Particle(x, y));
+                    }
+                }
+
+                function animate() {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    particles = particles.filter(p => p.alpha > 0);
+                    particles.forEach(p => {
+                        p.update();
+                        p.draw();
+                    });
+
+                    requestAnimationFrame(animate);
+                }
+
+                setInterval(createFirework, 700);
+                animate();
+            }
+        };
+    </script>
+</body>
+</html>
